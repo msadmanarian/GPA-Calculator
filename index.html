@@ -50,6 +50,9 @@
       <button class="tab-btn" data-tab="tab-audit" role="tab" id="tab-audit-btn">
         <span class="tab-icon">🎓</span> Degree Audit (148 Cr)
       </button>
+      <button class="tab-btn" data-tab="tab-routine" role="tab" id="tab-routine-btn">
+        <span class="tab-icon">📅</span> Class Routine & Timetable
+      </button>
       <button class="tab-btn" data-tab="tab-scale" role="tab" id="tab-scale-btn">
         <span class="tab-icon">📋</span> Official Grading Scale
       </button>
@@ -448,6 +451,80 @@
               <div class="cat-pill-grid" id="cat-pill-grid">
                 <!-- Injected via JavaScript -->
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+      <!-- TAB 6: CLASS ROUTINE & TIMETABLE SCHEDULER -->
+      <section id="tab-routine" class="tab-panel">
+        <div class="grid-2col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>AIUB Weekly Schedule & Routine Builder</h2>
+                <p class="card-desc">Organize class slots with room allocations and real-time schedule conflict / clash detection.</p>
+              </div>
+              <button id="routine-load-sample-btn" class="btn btn-secondary btn-sm">Load Semester 8 Routine</button>
+            </div>
+
+            <!-- Routine Add Form -->
+            <form id="routine-add-form" class="routine-form" onsubmit="return false;">
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="routine-course-input">Course Title / Code</label>
+                  <input type="text" id="routine-course-input" placeholder="e.g. Operating System (Theory)" required>
+                </div>
+                <div class="form-group">
+                  <label for="routine-room-input">Room No. / Building</label>
+                  <input type="text" id="routine-room-input" placeholder="e.g. Room 9304 / DS0204">
+                </div>
+              </div>
+
+              <div class="form-row-3">
+                <div class="form-group">
+                  <label for="routine-day-select">Day(s)</label>
+                  <select id="routine-day-select">
+                    <option value="Sunday">Sunday</option>
+                    <option value="Monday">Monday</option>
+                    <option value="Tuesday">Tuesday</option>
+                    <option value="Wednesday">Wednesday</option>
+                    <option value="Thursday">Thursday</option>
+                    <option value="Saturday">Saturday</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="routine-start-time">Start Time</label>
+                  <input type="time" id="routine-start-time" value="11:20">
+                </div>
+                <div class="form-group">
+                  <label for="routine-end-time">End Time</label>
+                  <input type="time" id="routine-end-time" value="12:50">
+                </div>
+              </div>
+
+              <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 0.5rem;">
+                <button type="button" id="routine-add-btn" class="btn btn-primary btn-sm">➕ Add Class Slot</button>
+                <button type="button" id="routine-clear-btn" class="btn btn-outline btn-sm">Clear Routine</button>
+              </div>
+            </form>
+
+            <!-- Clash Notice Banner -->
+            <div id="routine-clash-banner" class="clash-banner" style="display: none;">
+              <strong>⚠️ Schedule Clash Detected:</strong> Two or more classes are scheduled at overlapping times on the same day!
+            </div>
+          </div>
+
+          <!-- Schedule Display Card -->
+          <div class="card summary-card">
+            <div class="card-header">
+              <h2>Weekly Timetable</h2>
+              <span class="badge" id="routine-total-classes-badge">0 Classes</span>
+            </div>
+
+            <div class="routine-timetable-grid" id="routine-timetable-grid">
+              <!-- Days & Slots dynamically rendered -->
             </div>
           </div>
         </div>

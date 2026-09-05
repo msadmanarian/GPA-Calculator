@@ -63,6 +63,10 @@ $$\text{New Quality Points} = \text{Current Total QP} + [\text{Course Credits} \
   - Real-time retake impact simulator showing instantaneous CGPA boost when replacing a D or C grade with an A/A+.
 - **Official AIUB Grading Scale & Honors Reference**:
   - Complete matrix with criteria for *Summa Cum Laude* (&ge;3.90), *Magna Cum Laude* (&ge;3.75), *Cum Laude* (&ge;3.65), and *Dean's Honor List* (Term GPA &ge; 3.75, &ge; 12 credits).
+- **AIUB Weekly Class Routine & Timetable Scheduler**:
+  - Interactive weekly schedule builder supporting Sunday through Thursday timetable slots and campus room allocations (e.g., Building 1, 2, 3, Annex, DS0108).
+  - Real-time time-overlap conflict detection (schedule clash alert system).
+  - Pre-loaded with official AIUB Semester 8 course routine from `G:\AIUB`.
 - **148-Credit AIUB Degree Audit & Graduation Clearance Checklist**:
   - Full catalog of B.Sc. in CSE courses divided into academic groups (*General Education, Basic Sciences & Math, Core Computing, Major Electives, and Capstone/Thesis*).
   - Dynamic graduation progress bar with real-time remaining credits, estimated semesters to completion, and senior thesis eligibility tracking (>= 105 credits).
