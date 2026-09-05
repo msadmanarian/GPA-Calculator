@@ -47,6 +47,9 @@
       <button class="tab-btn" data-tab="tab-retake" role="tab" id="tab-retake-btn">
         <span class="tab-icon">🔄</span> Retake & Target Planner
       </button>
+      <button class="tab-btn" data-tab="tab-audit" role="tab" id="tab-audit-btn">
+        <span class="tab-icon">🎓</span> Degree Audit (148 Cr)
+      </button>
       <button class="tab-btn" data-tab="tab-scale" role="tab" id="tab-scale-btn">
         <span class="tab-icon">📋</span> Official Grading Scale
       </button>
@@ -376,6 +379,76 @@
                 </div>
               </div>
             </form>
+          </div>
+        </div>
+      </section>
+
+      
+      <!-- TAB 5: DEGREE AUDIT & GRADUATION CHECKLIST -->
+      <section id="tab-audit" class="tab-panel">
+        <div class="grid-2col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>AIUB B.Sc. in CSE Degree Audit</h2>
+                <p class="card-desc">Comprehensive 148-credit graduation checklist structured from official AIUB curriculum catalog.</p>
+              </div>
+              <div class="card-header-actions">
+                <button id="audit-select-all-btn" class="btn btn-outline btn-sm">Check Completed (~98 Cr)</button>
+                <button id="audit-reset-btn" class="btn btn-outline btn-sm">Reset</button>
+              </div>
+            </div>
+
+            <!-- Categories Container -->
+            <div class="audit-categories" id="audit-categories-container">
+              <!-- Dynamically populated categories -->
+            </div>
+          </div>
+
+          <!-- Audit Progress & Graduation Summary Card -->
+          <div class="card summary-card">
+            <div class="card-header">
+              <h2>Graduation Clearance Status</h2>
+              <span class="badge badge-accent" id="audit-status-badge">In Progress</span>
+            </div>
+
+            <div class="metric-display">
+              <div class="metric-label">Completed Degree Credits</div>
+              <div class="metric-value" id="audit-completed-cr-val">0.0</div>
+              <div class="metric-sub" id="audit-percent-sub">0.0% of 148.0 Total Credits</div>
+            </div>
+
+            <!-- Custom Progress Bar -->
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="audit-progress-fill" style="width: 0%;"></div>
+            </div>
+
+            <div class="metrics-grid" style="margin-top: 1.25rem;">
+              <div class="metric-box">
+                <span class="box-label">Remaining Credits</span>
+                <span class="box-val" id="audit-remaining-cr-val">148.0</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Completed Courses</span>
+                <span class="box-val" id="audit-completed-courses-val">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Est. Semesters Left</span>
+                <span class="box-val" id="audit-semesters-left-val">~10</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Senior Thesis Status</span>
+                <span class="box-val" id="audit-thesis-status" style="font-size: 0.95rem;">Eligible at 105 Cr</span>
+              </div>
+            </div>
+
+            <!-- Category Breakdown Pills -->
+            <div class="category-breakdown-box">
+              <h4>Credit Breakdown by Group:</h4>
+              <div class="cat-pill-grid" id="cat-pill-grid">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
           </div>
         </div>
       </section>
