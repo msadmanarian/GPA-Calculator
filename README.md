@@ -63,6 +63,10 @@ $$\text{New Quality Points} = \text{Current Total QP} + [\text{Course Credits} \
   - Real-time retake impact simulator showing instantaneous CGPA boost when replacing a D or C grade with an A/A+.
 - **Official AIUB Grading Scale & Honors Reference**:
   - Complete matrix with criteria for *Summa Cum Laude* (&ge;3.90), *Magna Cum Laude* (&ge;3.75), *Cum Laude* (&ge;3.65), and *Dean's Honor List* (Term GPA &ge; 3.75, &ge; 12 credits).
+- **148-Credit AIUB Degree Audit & Graduation Clearance Checklist**:
+  - Full catalog of B.Sc. in CSE courses divided into academic groups (*General Education, Basic Sciences & Math, Core Computing, Major Electives, and Capstone/Thesis*).
+  - Dynamic graduation progress bar with real-time remaining credits, estimated semesters to completion, and senior thesis eligibility tracking (>= 105 credits).
+  - Persistent state saved locally in the user's browser.
 - **Academic Retake Recommendation Engine & Advisory Alerts**:
   - Automatically identifies D (2.25) or F (0.00) courses according to AIUB academic standing guidelines.
   - Warns about blocked prerequisite paths for failing courses and calculates exact CGPA gain for retakes.

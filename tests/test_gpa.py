@@ -111,5 +111,20 @@ class TestAIUBGPACalculator(unittest.TestCase):
         self.assertEqual(len(failing), 1)
         self.assertEqual(failing[0]['title'], 'English')
 
+    def test_degree_audit_clearance(self):
+        # AIUB B.Sc. in CSE requires 148 credits for graduation
+        total_degree_credits = 148.0
+        senior_thesis_threshold = 105.0
+        
+        # Test current senior status (e.g. 98 credits earned)
+        earned = 98.0
+        self.assertLess(earned, total_degree_credits)
+        self.assertFalse(earned >= senior_thesis_threshold)
+        
+        # After completing semester 8 (15 credits) -> 113.0
+        earned_after_sem8 = earned + 15.0
+        self.assertTrue(earned_after_sem8 >= senior_thesis_threshold)
+        self.assertEqual(total_degree_credits - earned_after_sem8, 35.0)
+
 if __name__ == '__main__':
     unittest.main()

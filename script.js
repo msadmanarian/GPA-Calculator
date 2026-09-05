@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Load default course bundle
   initStudentProfile();
+  initDegreeAudit();
   initCSVFeatures();
   if (!loadCoursesFromStorage()) {
     loadCoursesPreset('sem8');
@@ -991,4 +992,252 @@ function updateAcademicAdvisor() {
       calculateRetakeImpact();
     });
   });
+}
+
+
+/* =========================================================
+   AIUB 148-Credit Degree Audit Engine
+   Curriculum data sourced directly from G:\AIUB Course Plan
+   ========================================================= */
+const AIUB_DEGREE_CURRICULUM = [
+  {
+    group: 'General Education & Business (16 Cr)',
+    requiredCr: 16,
+    courses: [
+      { code: 'ENG1101', title: 'English Reading & Composition', cr: 3, sem: 1 },
+      { code: 'ACT1111', title: 'Financial & Managerial Accounting', cr: 3, sem: 1 },
+      { code: 'ENG1202', title: 'English Writing & Speaking', cr: 3, sem: 2 },
+      { code: 'BGS2101', title: 'Bangladesh Studies', cr: 3, sem: 5 },
+      { code: 'ECO2102', title: 'Economics', cr: 2, sem: 5 },
+      { code: 'ETH3101', title: 'Engineering Ethics', cr: 2, sem: 9 }
+    ]
+  },
+  {
+    group: 'Basic Science & Mathematics (28 Cr)',
+    requiredCr: 28,
+    courses: [
+      { code: 'MAT1102', title: 'Differential Calculus & Geometry (Math 1)', cr: 3, sem: 1 },
+      { code: 'PHY1101', title: 'Physics 1 (Theory)', cr: 3, sem: 1 },
+      { code: 'PHY1102', title: 'Physics 1 (Laboratory)', cr: 1, sem: 2 },
+      { code: 'MAT1203', title: 'Integral Calculus & Diff Equations (Math 2)', cr: 3, sem: 2 },
+      { code: 'MAT2104', title: 'Complex Variables & Laplace (Math 3)', cr: 3, sem: 3 },
+      { code: 'PHY2103', title: 'Physics 2 (Theory)', cr: 3, sem: 3 },
+      { code: 'PHY2104', title: 'Physics 2 (Laboratory)', cr: 1, sem: 3 },
+      { code: 'MAT2205', title: 'Matrices, Vectors & Fourier (Math 4)', cr: 3, sem: 4 },
+      { code: 'MAT3106', title: 'Statistics & Probability (Math 5)', cr: 3, sem: 5 },
+      { code: 'CHM2101', title: 'Chemistry (Theory & Lab)', cr: 3, sem: 6 },
+      { code: 'MAT3207', title: 'Numerical Methods (Math 6)', cr: 2, sem: 4 }
+    ]
+  },
+  {
+    group: 'Core Computing & Engineering (86 Cr)',
+    requiredCr: 86,
+    courses: [
+      { code: 'CSC1102', title: 'Introduction to Computer Studies', cr: 3, sem: 1 },
+      { code: 'CSC1204', title: 'Discrete Mathematics', cr: 3, sem: 1 },
+      { code: 'EEE1201', title: 'Electrical Circuits 1 (Theory)', cr: 3, sem: 2 },
+      { code: 'EEE1202', title: 'Electrical Circuits 1 (Laboratory)', cr: 1, sem: 2 },
+      { code: 'CSC1205', title: 'Introduction to Programming (C++)', cr: 3, sem: 2 },
+      { code: 'CSC1206', title: 'IP Laboratory', cr: 1, sem: 2 },
+      { code: 'CSC2107', title: 'Object-Oriented Programming (Java)', cr: 3, sem: 3 },
+      { code: 'CSC2108', title: 'Database Management Systems', cr: 3, sem: 4 },
+      { code: 'CSC2109', title: 'Data Structures (Theory)', cr: 3, sem: 4 },
+      { code: 'CSC2110', title: 'Data Structures (Laboratory)', cr: 1, sem: 4 },
+      { code: 'EEE2105', title: 'Electronic Devices (Theory)', cr: 3, sem: 4 },
+      { code: 'EEE2106', title: 'Electronic Devices (Laboratory)', cr: 1, sem: 4 },
+      { code: 'CSC3111', title: 'Algorithms (Theory & Lab)', cr: 3, sem: 5 },
+      { code: 'EEE3107', title: 'Digital Logic Circuits (Theory)', cr: 3, sem: 5 },
+      { code: 'EEE3108', title: 'Digital Logic Circuits (Laboratory)', cr: 1, sem: 5 },
+      { code: 'CSC3112', title: 'Object-Oriented Analysis & Design', cr: 3, sem: 5 },
+      { code: 'CSC3213', title: 'C# and .NET Framework', cr: 3, sem: 6 },
+      { code: 'CSC3214', title: 'Theory of Computation', cr: 3, sem: 6 },
+      { code: 'CSC3215', title: 'Compiler Design', cr: 3, sem: 7 },
+      { code: 'EEE3209', title: 'Microprocessors & Embedded Systems', cr: 3, sem: 7 },
+      { code: 'CSC3216', title: 'Software Engineering', cr: 3, sem: 7 },
+      { code: 'COE3210', title: 'Computer-Aided Design & Drafting (CAD)', cr: 1, sem: 7 },
+      { code: 'CSC4117', title: 'Artificial Intelligence & Expert Systems', cr: 3, sem: 8 },
+      { code: 'CSC4118', title: 'Computer Graphics', cr: 3, sem: 8 },
+      { code: 'CSC4119', title: 'Computer Organization & Architecture', cr: 3, sem: 8 },
+      { code: 'CSC4120', title: 'Data Communication', cr: 3, sem: 8 },
+      { code: 'CSC4121', title: 'Web Technologies', cr: 3, sem: 8 },
+      { code: 'CSC4222', title: 'Operating Systems (Theory & Lab)', cr: 3, sem: 9 },
+      { code: 'CSC4223', title: 'Computer Networks (Theory & Lab)', cr: 3, sem: 9 }
+    ]
+  },
+  {
+    group: 'Major Specialization Electives (9 Cr)',
+    requiredCr: 9,
+    courses: [
+      { code: 'CSC4260', title: 'Machine Learning (Major 1)', cr: 3, sem: 9 },
+      { code: 'CSC4261', title: 'Deep Learning / NLP (Major 2)', cr: 3, sem: 10 },
+      { code: 'CSC4262', title: 'Cloud Computing / Cybersecurity (Major 3)', cr: 3, sem: 11 }
+    ]
+  },
+  {
+    group: 'Capstone Design & Practical Work (9 Cr)',
+    requiredCr: 9,
+    courses: [
+      { code: 'CSC4298', title: 'Research Methodology', cr: 3, sem: 9 },
+      { code: 'CSC4299', title: 'Senior Thesis / Capstone Project', cr: 3, sem: 10 },
+      { code: 'CSC4300', title: 'Professional Internship / Practical Training', cr: 3, sem: 11 }
+    ]
+  }
+];
+
+let completedAuditCodes = new Set();
+
+function initDegreeAudit() {
+  const container = document.getElementById('audit-categories-container');
+  if (!container) return;
+
+  // Load saved audit states
+  const saved = localStorage.getItem('aiub-audit-completed');
+  if (saved) {
+    try {
+      const arr = JSON.parse(saved);
+      if (Array.isArray(arr)) completedAuditCodes = new Set(arr);
+    } catch(e) {}
+  } else {
+    // Default preset: ~98 credits completed through Semester 7
+    AIUB_DEGREE_CURRICULUM.forEach(group => {
+      group.courses.forEach(c => {
+        if (c.sem && c.sem <= 7) completedAuditCodes.add(c.code);
+      });
+    });
+  }
+
+  renderDegreeAudit();
+
+  document.getElementById('audit-select-all-btn')?.addEventListener('click', () => {
+    completedAuditCodes.clear();
+    AIUB_DEGREE_CURRICULUM.forEach(group => {
+      group.courses.forEach(c => {
+        if (c.sem && c.sem <= 7) completedAuditCodes.add(c.code);
+      });
+    });
+    saveAuditProgress();
+    renderDegreeAudit();
+  });
+
+  document.getElementById('audit-reset-btn')?.addEventListener('click', () => {
+    if (confirm('Reset all degree audit checklist items?')) {
+      completedAuditCodes.clear();
+      saveAuditProgress();
+      renderDegreeAudit();
+    }
+  });
+}
+
+function renderDegreeAudit() {
+  const container = document.getElementById('audit-categories-container');
+  if (!container) return;
+
+  container.innerHTML = '';
+  let totalEarnedCr = 0;
+  let totalCoursesDone = 0;
+  const groupStatus = [];
+
+  AIUB_DEGREE_CURRICULUM.forEach((group, gIdx) => {
+    const groupCard = document.createElement('div');
+    groupCard.className = 'audit-group';
+
+    let groupEarnedCr = 0;
+    const coursesHtml = group.courses.map(c => {
+      const isDone = completedAuditCodes.has(c.code);
+      if (isDone) {
+        groupEarnedCr += c.cr;
+        totalEarnedCr += c.cr;
+        totalCoursesDone++;
+      }
+      return `
+        <div class="audit-course-item ${isDone ? 'completed' : ''}">
+          <label class="audit-course-label">
+            <input type="checkbox" class="audit-checkbox" data-code="${c.code}" ${isDone ? 'checked' : ''}>
+            <span>${c.code} - ${c.title}</span>
+          </label>
+          <span class="audit-cr-tag">${c.cr.toFixed(1)} Cr</span>
+        </div>
+      `;
+    }).join('');
+
+    groupStatus.push({
+      name: group.group,
+      earned: groupEarnedCr,
+      required: group.requiredCr
+    });
+
+    groupCard.innerHTML = `
+      <div class="audit-group-header">
+        <span class="audit-group-title">${group.group}</span>
+        <span class="audit-group-credits">${groupEarnedCr.toFixed(1)} / ${group.requiredCr.toFixed(1)} Cr</span>
+      </div>
+      <div class="audit-courses-grid">
+        ${coursesHtml}
+      </div>
+    `;
+    container.appendChild(groupCard);
+  });
+
+  // Attach checkbox listeners
+  container.querySelectorAll('.audit-checkbox').forEach(cb => {
+    cb.addEventListener('change', (e) => {
+      const code = e.target.getAttribute('data-code');
+      if (e.target.checked) {
+        completedAuditCodes.add(code);
+      } else {
+        completedAuditCodes.delete(code);
+      }
+      saveAuditProgress();
+      renderDegreeAudit();
+    });
+  });
+
+  // Update Summary Metrics
+  const remainingCr = Math.max(0, 148 - totalEarnedCr);
+  const percent = Math.min(100, (totalEarnedCr / 148) * 100);
+
+  document.getElementById('audit-completed-cr-val').textContent = totalEarnedCr.toFixed(1);
+  document.getElementById('audit-percent-sub').textContent = `${percent.toFixed(1)}% of 148.0 Total Credits`;
+  document.getElementById('audit-progress-fill').style.width = `${percent}%`;
+  document.getElementById('audit-remaining-cr-val').textContent = remainingCr.toFixed(1);
+  document.getElementById('audit-completed-courses-val').textContent = totalCoursesDone;
+
+  const estSemesters = Math.ceil(remainingCr / 15);
+  document.getElementById('audit-semesters-left-val').textContent = remainingCr === 0 ? '0 (Graduate!)' : `~${estSemesters} Sem`;
+
+  const thesisStatus = document.getElementById('audit-thesis-status');
+  if (totalEarnedCr >= 105) {
+    thesisStatus.textContent = '✅ Eligible';
+    thesisStatus.style.color = 'var(--success)';
+  } else {
+    thesisStatus.textContent = `${(105 - totalEarnedCr).toFixed(1)} Cr to go`;
+    thesisStatus.style.color = 'var(--text-secondary)';
+  }
+
+  const badge = document.getElementById('audit-status-badge');
+  if (totalEarnedCr >= 148) {
+    badge.textContent = '🎓 Degree Clearance Approved';
+    badge.className = 'badge';
+  } else if (totalEarnedCr >= 105) {
+    badge.textContent = 'Senior Standing (Final Year)';
+    badge.className = 'badge badge-accent';
+  } else {
+    badge.textContent = 'Undergraduate In-Progress';
+    badge.className = 'badge';
+  }
+
+  // Update breakdown pills
+  const pillGrid = document.getElementById('cat-pill-grid');
+  if (pillGrid) {
+    pillGrid.innerHTML = groupStatus.map(g => `
+      <div class="cat-pill">
+        <span>${g.name.split(' (')[0]}</span>
+        <strong>${g.earned.toFixed(1)} / ${g.required.toFixed(1)} Cr</strong>
+      </div>
+    `).join('');
+  }
+}
+
+function saveAuditProgress() {
+  localStorage.setItem('aiub-audit-completed', JSON.stringify(Array.from(completedAuditCodes)));
 }
