@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="AIUB GPA & CGPA Planning Suite - Official grading scale, term GPA calculation, CGPA forecasting, and course retake planner for American International University-Bangladesh.">
+  <title>AIUB GPA & CGPA Calculator | Academic Planning Suite</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="logo-icon">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <div>
+          <h1>AIUB GPA & CGPA Calculator</h1>
+          <p class="subtitle">Official Academic Planning & Honors Projection Suite for AIUB Students</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button id="theme-toggle-btn" class="icon-btn" aria-label="Toggle Theme" title="Toggle Light/Dark Theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+        <button id="quick-preset-btn" class="btn btn-secondary" title="Load real AIUB Semester course template">
+          ⚡ Load AIUB Preset
+        </button>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="tab-term" role="tab" id="tab-term-btn">
+        <span class="tab-icon">📊</span> Semester GPA
+      </button>
+      <button class="tab-btn" data-tab="tab-cgpa" role="tab" id="tab-cgpa-btn">
+        <span class="tab-icon">🎯</span> CGPA Forecaster
+      </button>
+      <button class="tab-btn" data-tab="tab-retake" role="tab" id="tab-retake-btn">
+        <span class="tab-icon">🔄</span> Retake & Target Planner
+      </button>
+      <button class="tab-btn" data-tab="tab-scale" role="tab" id="tab-scale-btn">
+        <span class="tab-icon">📋</span> Official Grading Scale
+      </button>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      
+      <!-- TAB 1: SEMESTER GPA CALCULATOR -->
+      <section id="tab-term" class="tab-panel active">
+        <div class="grid-2col">
+          <!-- Course Input Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Current Semester Courses</h2>
+                <p class="card-desc">Enter course details, credits, and earned marks or letter grades.</p>
+              </div>
+              <div class="card-header-actions">
+                <button id="add-course-btn" class="btn btn-primary btn-sm">
+                  <span>➕ Add Course</span>
+                </button>
+                <button id="reset-courses-btn" class="btn btn-outline btn-sm">
+                  <span>🗑️ Clear</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="table-responsive">
+              <table class="courses-table" id="courses-table">
+                <thead>
+                  <tr>
+                    <th style="width: 35%;">Course Title / Code</th>
+                    <th style="width: 18%;">Credits</th>
+                    <th style="width: 25%;">Grade / Marks</th>
+                    <th style="width: 12%;">GP</th>
+                    <th style="width: 10%; text-align: center;">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="courses-body">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Quick Add / Info Bar -->
+            <div class="quick-info-bar">
+              <span>💡 <em>Tip: You can either pick a Letter Grade directly or enter exam marks (0-100) to auto-convert.</em></span>
+            </div>
+          </div>
+
+          <!-- Summary & Standing Card -->
+          <div class="card summary-card">
+            <div class="card-header">
+              <h2>Semester Academic Summary</h2>
+              <span class="badge" id="academic-status-badge">Good Standing</span>
+            </div>
+
+            <div class="metric-display">
+              <div class="metric-label">Estimated Term GPA</div>
+              <div class="metric-value" id="term-gpa-val">0.00</div>
+              <div class="metric-sub" id="term-gpa-letter">Grade: N/A</div>
+            </div>
+
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="box-label">Total Credits</span>
+                <span class="box-val" id="total-credits-val">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Earned Quality Points</span>
+                <span class="box-val" id="total-qp-val">0.00</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Total Courses</span>
+                <span class="box-val" id="total-courses-val">0</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Passing Credits</span>
+                <span class="box-val" id="passed-credits-val">0</span>
+              </div>
+            </div>
+
+            <!-- Academic Distinction / Honor Projection -->
+            <div class="honors-card" id="honors-card">
+              <div class="honors-icon">🏆</div>
+              <div class="honors-content">
+                <h4 id="honors-title">Honors & Standing Status</h4>
+                <p id="honors-desc">Add your courses to see your Dean's List or distinction standing.</p>
+              </div>
+            </div>
+
+            <!-- Semester Action Buttons -->
+            <div class="summary-actions">
+              <button id="send-to-cgpa-btn" class="btn btn-primary btn-block">
+                <span>Forward to CGPA Forecaster ➔</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: CGPA FORECASTER -->
+      <section id="tab-cgpa" class="tab-panel">
+        <div class="grid-2col">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Cumulative Academic History</h2>
+                <p class="card-desc">Enter your previous records and project your new Cumulative GPA.</p>
+              </div>
+            </div>
+
+            <form id="cgpa-form" class="form-vertical" onsubmit="return false;">
+              <div class="form-group">
+                <label for="prev-credits">Completed Credits (Previous Semesters)</label>
+                <input type="number" id="prev-credits" min="0" max="180" step="0.5" placeholder="e.g. 98" value="98">
+                <small class="form-hint">Total successfully earned credits prior to current semester.</small>
+              </div>
+
+              <div class="form-group">
+                <label for="prev-cgpa">Current Cumulative GPA (CGPA)</label>
+                <input type="number" id="prev-cgpa" min="0" max="4.00" step="0.01" placeholder="e.g. 3.72" value="3.72">
+                <small class="form-hint">Current official CGPA shown on VUE / portal.</small>
+              </div>
+
+              <hr class="divider">
+
+              <div class="form-group">
+                <label for="curr-term-credits">Current Semester Credits</label>
+                <input type="number" id="curr-term-credits" min="1" max="25" step="0.5" placeholder="e.g. 15" value="15">
+              </div>
+
+              <div class="form-group">
+                <label for="curr-term-gpa">Expected Semester GPA</label>
+                <input type="number" id="curr-term-gpa" min="0" max="4.00" step="0.01" placeholder="e.g. 3.85" value="3.85">
+                <small class="form-hint">You can also auto-sync this from Tab 1.</small>
+              </div>
+
+              <button id="sync-from-term-btn" class="btn btn-secondary btn-sm" type="button">
+                🔄 Sync from Semester Tab
+              </button>
+            </form>
+          </div>
+
+          <div class="card summary-card">
+            <div class="card-header">
+              <h2>Projected CGPA Result</h2>
+              <span class="badge badge-accent" id="cgpa-delta-badge">+0.02 Change</span>
+            </div>
+
+            <div class="metric-display">
+              <div class="metric-label">New Cumulative CGPA</div>
+              <div class="metric-value" id="projected-cgpa-val">3.74</div>
+              <div class="metric-sub" id="projected-cgpa-standing">Summa Cum Laude / High Distinction Eligible</div>
+            </div>
+
+            <div class="metrics-grid">
+              <div class="metric-box">
+                <span class="box-label">Old Total Credits</span>
+                <span class="box-val" id="disp-prev-credits">98.0</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">New Total Credits</span>
+                <span class="box-val" id="disp-new-credits">113.0</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Degree Progress (148 Cr)</span>
+                <span class="box-val" id="disp-degree-prog">76.4%</span>
+              </div>
+              <div class="metric-box">
+                <span class="box-label">Total Quality Points</span>
+                <span class="box-val" id="disp-total-qp">422.3</span>
+              </div>
+            </div>
+
+            <!-- Graduation Distinction Breakdown -->
+            <div class="academic-guidance-box">
+              <h4>AIUB Graduation Honors Benchmarks:</h4>
+              <ul class="guidance-list">
+                <li><span class="gold-dot">●</span> <strong>Summa Cum Laude:</strong> CGPA 3.90 - 4.00</li>
+                <li><span class="silver-dot">●</span> <strong>Magna Cum Laude:</strong> CGPA 3.75 - 3.89</li>
+                <li><span class="bronze-dot">●</span> <strong>Cum Laude:</strong> CGPA 3.65 - 3.74</li>
+                <li><span class="green-dot">●</span> <strong>Dean's Honor List:</strong> Term GPA &ge; 3.75 (min 12 credits)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: RETAKE & TARGET PLANNER -->
+      <section id="tab-retake" class="tab-panel">
+        <div class="grid-2col">
+          <!-- Target CGPA Planner -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Target CGPA Required GPA Calculator</h2>
+                <p class="card-desc">Determine what average GPA you must achieve across remaining semesters to graduate with your dream CGPA.</p>
+              </div>
+            </div>
+
+            <form id="target-form" class="form-vertical" onsubmit="return false;">
+              <div class="form-group">
+                <label for="target-current-cgpa">Current CGPA</label>
+                <input type="number" id="target-current-cgpa" min="0" max="4.00" step="0.01" value="3.50">
+              </div>
+              <div class="form-group">
+                <label for="target-earned-credits">Credits Completed So Far</label>
+                <input type="number" id="target-earned-credits" min="0" max="180" step="1" value="90">
+              </div>
+              <div class="form-group">
+                <label for="target-remaining-credits">Remaining Credits to Complete</label>
+                <input type="number" id="target-remaining-credits" min="1" max="150" step="1" value="58">
+              </div>
+              <div class="form-group">
+                <label for="target-desired-cgpa">Desired Graduation CGPA</label>
+                <input type="number" id="target-desired-cgpa" min="0" max="4.00" step="0.01" value="3.75">
+              </div>
+
+              <div class="target-result-box" id="target-result-box">
+                <div class="target-res-label">Required GPA in Remaining Credits:</div>
+                <div class="target-res-value" id="target-required-gpa-val">--</div>
+                <div class="target-res-status" id="target-required-status">Enter values above</div>
+              </div>
+            </form>
+          </div>
+
+          <!-- Course Retake Impact Calculator -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <h2>Course Retake Impact Simulator</h2>
+                <p class="card-desc">Simulate how improving an earlier grade (e.g. replacing a D/C with an A/A+) elevates your overall CGPA.</p>
+              </div>
+            </div>
+
+            <form id="retake-form" class="form-vertical" onsubmit="return false;">
+              <div class="form-group">
+                <label for="retake-current-cgpa">Current CGPA</label>
+                <input type="number" id="retake-current-cgpa" min="0" max="4.00" step="0.01" value="3.60">
+              </div>
+              <div class="form-group">
+                <label for="retake-total-credits">Total Credits Attempted (Completed)</label>
+                <input type="number" id="retake-total-credits" min="1" max="180" step="1" value="98">
+              </div>
+              <div class="form-row-2">
+                <div class="form-group">
+                  <label for="retake-course-credits">Course Credits</label>
+                  <select id="retake-course-credits">
+                    <option value="3" selected>3.0 Credits (Standard Theory/Lab)</option>
+                    <option value="1">1.0 Credit (Standalone Lab)</option>
+                    <option value="2">2.0 Credits (Specialized Course)</option>
+                    <option value="4">4.0 Credits (Major Project/Thesis)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="retake-old-grade">Previous Grade</label>
+                  <select id="retake-old-grade">
+                    <option value="2.25">D (2.25 GP)</option>
+                    <option value="2.50">D+ (2.50 GP)</option>
+                    <option value="2.75" selected>C (2.75 GP)</option>
+                    <option value="3.00">C+ (3.00 GP)</option>
+                    <option value="3.25">B (3.25 GP)</option>
+                    <option value="0.00">F (0.00 GP)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="retake-new-grade">New Expected Grade</label>
+                <select id="retake-new-grade">
+                  <option value="4.00" selected>A+ (4.00 GP - 90%+)</option>
+                  <option value="3.75">A (3.75 GP - 85-89%)</option>
+                  <option value="3.50">B+ (3.50 GP - 80-84%)</option>
+                  <option value="3.25">B (3.25 GP - 75-79%)</option>
+                </select>
+              </div>
+
+              <div class="retake-impact-box">
+                <div class="retake-metric">
+                  <span class="rm-label">CGPA Boost:</span>
+                  <span class="rm-val text-success" id="retake-boost-val">+0.04</span>
+                </div>
+                <div class="retake-metric">
+                  <span class="rm-label">New CGPA:</span>
+                  <span class="rm-val" id="retake-new-cgpa-val">3.64</span>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 4: OFFICIAL GRADING SCALE REFERENCE -->
+      <section id="tab-scale" class="tab-panel">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2>American International University-Bangladesh (AIUB) Grading Policy</h2>
+              <p class="card-desc">Standard uniform grading framework, quality points, and academic regulations.</p>
+            </div>
+            <button id="print-scale-btn" class="btn btn-outline btn-sm">🖨️ Print Grading Matrix</button>
+          </div>
+
+          <div class="table-responsive">
+            <table class="scale-table">
+              <thead>
+                <tr>
+                  <th>Numerical Marks (%)</th>
+                  <th>Letter Grade</th>
+                  <th>Grade Point (GP)</th>
+                  <th>Qualitative Assessment</th>
+                  <th>Academic Standing & Progression Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td><strong>90% – 100%</strong></td>
+                  <td><span class="grade-pill grade-aplus">A+</span></td>
+                  <td><strong>4.00</strong></td>
+                  <td>Outstanding</td>
+                  <td>Dean's List / Highest Academic Distinction eligibility.</td>
+                </tr>
+                <tr>
+                  <td><strong>85% – 89%</strong></td>
+                  <td><span class="grade-pill grade-a">A</span></td>
+                  <td><strong>3.75</strong></td>
+                  <td>Excellent</td>
+                  <td>Magna Cum Laude benchmark range.</td>
+                </tr>
+                <tr>
+                  <td><strong>80% – 84%</strong></td>
+                  <td><span class="grade-pill grade-bplus">B+</span></td>
+                  <td><strong>3.50</strong></td>
+                  <td>Very Good</td>
+                  <td>Cum Laude benchmark range.</td>
+                </tr>
+                <tr>
+                  <td><strong>75% – 79%</strong></td>
+                  <td><span class="grade-pill grade-b">B</span></td>
+                  <td><strong>3.25</strong></td>
+                  <td>Good</td>
+                  <td>Strong foundation, eligible for graduate assistantships.</td>
+                </tr>
+                <tr>
+                  <td><strong>70% – 74%</strong></td>
+                  <td><span class="grade-pill grade-cplus">C+</span></td>
+                  <td><strong>3.00</strong></td>
+                  <td>Satisfactory</td>
+                  <td>Satisfactory academic standing.</td>
+                </tr>
+                <tr>
+                  <td><strong>65% – 69%</strong></td>
+                  <td><span class="grade-pill grade-c">C</span></td>
+                  <td><strong>2.75</strong></td>
+                  <td>Pass</td>
+                  <td>Passing grade for undergraduate coursework.</td>
+                </tr>
+                <tr>
+                  <td><strong>60% – 64%</strong></td>
+                  <td><span class="grade-pill grade-dplus">D+</span></td>
+                  <td><strong>2.50</strong></td>
+                  <td>Passing</td>
+                  <td>Marginal pass; recommended candidate for retake.</td>
+                </tr>
+                <tr>
+                  <td><strong>50% – 59%</strong></td>
+                  <td><span class="grade-pill grade-d">D</span></td>
+                  <td><strong>2.25</strong></td>
+                  <td>Conditional Passing</td>
+                  <td>Lowest undergraduate passing grade.</td>
+                </tr>
+                <tr class="failing-row">
+                  <td><strong>0% – 49%</strong></td>
+                  <td><span class="grade-pill grade-f">F</span></td>
+                  <td><strong>0.00</strong></td>
+                  <td>Failing</td>
+                  <td>No credit earned. Course must be repeated.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="formula-card">
+            <h3>Key Mathematical Formulas:</h3>
+            <div class="formula-grid">
+              <div class="formula-box">
+                <span class="formula-title">Term Grade Point Average (GPA):</span>
+                <code>GPA = &Sigma; (Credits &times; Grade Points) / &Sigma; Credits</code>
+              </div>
+              <div class="formula-box">
+                <span class="formula-title">Cumulative Grade Point Average (CGPA):</span>
+                <code>CGPA = Total Quality Points / Total Credits Earned</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div class="footer-content">
+        <p><strong>Antigravity 30-Day AIUB GitHub Challenge</strong> — Day 01 Project</p>
+        <p class="footer-sub">Engineered with Vanilla HTML5, CSS3, & Modern JavaScript. Academic Source: <code>G:\AIUB</code> coursework.</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Preset Modal -->
+  <div class="modal-overlay" id="preset-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Load AIUB Real Semester Preset</h3>
+        <button class="modal-close-btn" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Select an actual semester curriculum from AIUB coursework in <code>G:\AIUB</code>:</p>
+        <div class="preset-list">
+          <button class="preset-item" data-preset="sem1">
+            <div class="preset-title">Semester 1 (23-3) — Foundation</div>
+            <div class="preset-courses">Discrete Math (3 Cr), ICS (3 Cr), Math 1 (3 Cr), Physics (3 Cr), Accounting (3 Cr), English (3 Cr)</div>
+          </button>
+          <button class="preset-item" data-preset="sem4">
+            <div class="preset-title">Semester 4 (24-3) — Core CS</div>
+            <div class="preset-courses">Database (3 Cr), Data Structure Theory (3 Cr), DS Lab (1 Cr), Device Theory (3 Cr), Device Lab (1 Cr), Math 4 (3 Cr)</div>
+          </button>
+          <button class="preset-item" data-preset="sem8">
+            <div class="preset-title">Semester 8 (26-1) — Advanced CS</div>
+            <div class="preset-courses">Artificial Intelligence (3 Cr), Computer Graphics (3 Cr), COA (3 Cr), Data Communication (3 Cr), Web Tech (3 Cr)</div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
