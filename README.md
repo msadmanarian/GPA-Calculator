@@ -63,6 +63,13 @@ $$\text{New Quality Points} = \text{Current Total QP} + [\text{Course Credits} \
   - Real-time retake impact simulator showing instantaneous CGPA boost when replacing a D or C grade with an A/A+.
 - **Official AIUB Grading Scale & Honors Reference**:
   - Complete matrix with criteria for *Summa Cum Laude* (&ge;3.90), *Magna Cum Laude* (&ge;3.75), *Cum Laude* (&ge;3.65), and *Dean's Honor List* (Term GPA &ge; 3.75, &ge; 12 credits).
+- **Student Profile & Official Grade Slip Export**:
+  - Configurable student credentials (Name, Student ID, Department/Program, and Academic Session).
+  - One-click "Export Grade Slip" generating an official-style academic grade sheet slip formatted with university headers, course metrics, and advisor signature lines for print or PDF export.
+- **CSV Data Import & Export**:
+  - Full semester course backup to `.csv` and instant bulk course restoration from CSV files.
+- **Offline LocalStorage Persistence**:
+  - Auto-saves student profile details and active course records to browser local storage.
 - **Curriculum Presets**:
   - Pre-loaded with actual AIUB semester curricula from `G:\AIUB` (Semester 1 Foundation, Semester 4 Core CS, Semester 8 Advanced CS).
 - **Modern User Experience**:

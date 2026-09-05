@@ -75,7 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
   initPresetModal();
 
   // Load default course bundle
-  loadCoursesPreset('sem8');
+  initStudentProfile();
+  initCSVFeatures();
+  if (!loadCoursesFromStorage()) {
+    loadCoursesPreset('sem8');
+  }
 });
 
 /* =========================================================
@@ -288,6 +292,7 @@ function attachCourseRowListeners() {
 
 // Compute Term GPA according to AIUB Formula
 function calculateSemesterGPA() {
+  saveCoursesToStorage();
   let totalCredits = 0;
   let totalQualityPoints = 0;
   let passedCredits = 0;
@@ -569,4 +574,213 @@ function loadCoursesPreset(presetKey) {
     renderCourseRows();
     calculateSemesterGPA();
   }
+}
+
+
+/* =========================================================
+   Student Profile & LocalStorage Persistence
+   ========================================================= */
+function initStudentProfile() {
+  const profileFields = ['student-name', 'student-id', 'student-program', 'student-term'];
+  profileFields.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      const saved = localStorage.getItem('aiub-profile-' + id);
+      if (saved) el.value = saved;
+      el.addEventListener('input', (e) => {
+        localStorage.setItem('aiub-profile-' + id, e.target.value);
+      });
+    }
+  });
+}
+
+function saveCoursesToStorage() {
+  localStorage.setItem('aiub-courses-data', JSON.stringify(currentCourses));
+}
+
+function loadCoursesFromStorage() {
+  try {
+    const saved = localStorage.getItem('aiub-courses-data');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        currentCourses = parsed;
+        renderCourseRows();
+        calculateSemesterGPA();
+        return true;
+      }
+    }
+  } catch (e) {
+    console.error('Failed to parse saved courses:', e);
+  }
+  return false;
+}
+
+/* =========================================================
+   CSV Import & Export Engine
+   ========================================================= */
+function initCSVFeatures() {
+  const exportBtn = document.getElementById('export-csv-btn');
+  const importInput = document.getElementById('import-csv-input');
+  const printSlipBtn = document.getElementById('print-transcript-btn');
+
+  if (exportBtn) {
+    exportBtn.addEventListener('click', exportCoursesToCSV);
+  }
+
+  if (importInput) {
+    importInput.addEventListener('change', handleCSVImport);
+  }
+
+  if (printSlipBtn) {
+    printSlipBtn.addEventListener('click', prepareAndPrintGradeSlip);
+  }
+}
+
+function exportCoursesToCSV() {
+  if (currentCourses.length === 0) {
+    alert('No courses to export! Add courses first.');
+    return;
+  }
+
+  let csvContent = 'Course Title,Credits,Grade,Grade Point\r\n';
+  currentCourses.forEach(c => {
+    const cleanTitle = '"' + (c.title || '').replace(/"/g, '""') + '"';
+    csvContent += `${cleanTitle},${c.credits},${c.grade},${c.gp.toFixed(2)}\r\n`;
+  });
+
+  const studentId = (document.getElementById('student-id')?.value || 'student').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
+  const filename = `AIUB_Grades_${studentId}.csv`;
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', filename);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function handleCSVImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const text = e.target.result;
+    const lines = text.split(/\r?\n/);
+    const newCourses = [];
+
+    // Skip header line if present
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      if (i === 0 && line.toLowerCase().includes('course title')) continue;
+
+      // Simple CSV regex for quoted fields
+      const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+      if (cols.length >= 2) {
+        const title = cols[0].replace(/^"|"$/g, '').trim();
+        const credits = parseFloat(cols[1]) || 3;
+        const grade = cols[2] ? cols[2].trim() : 'A';
+        const gp = cols[3] !== undefined ? parseFloat(cols[3]) : (getGradePointDetailsFromLetter(grade) || 3.75);
+
+        newCourses.push({
+          id: Date.now() + Math.random().toString(36).substr(2, 5),
+          title: title,
+          credits: credits,
+          grade: grade,
+          gp: gp
+        });
+      }
+    }
+
+    if (newCourses.length > 0) {
+      currentCourses = newCourses;
+      renderCourseRows();
+      calculateSemesterGPA();
+      saveCoursesToStorage();
+      alert(`Successfully imported ${newCourses.length} courses from CSV.`);
+    } else {
+      alert('Could not parse any courses from the provided CSV file.');
+    }
+    event.target.value = ''; // Reset input
+  };
+  reader.readAsText(file);
+}
+
+function getGradePointDetailsFromLetter(letter) {
+  const match = AIUB_GRADING_SCALE.find(item => item.grade.toLowerCase() === letter.toLowerCase());
+  return match ? match.gp : 3.75;
+}
+
+/* =========================================================
+   Official Grade Slip Generator & Print Handler
+   ========================================================= */
+function prepareAndPrintGradeSlip() {
+  if (currentCourses.length === 0) {
+    alert('Please add at least one course to generate your official grade slip.');
+    return;
+  }
+
+  // Populate metadata
+  const name = document.getElementById('student-name')?.value || 'N/A';
+  const id = document.getElementById('student-id')?.value || 'N/A';
+  const program = document.getElementById('student-program')?.value || 'N/A';
+  const term = document.getElementById('student-term')?.value || 'N/A';
+  const standing = document.getElementById('academic-status-badge')?.textContent || 'Good Standing';
+
+  document.getElementById('print-disp-name').textContent = name;
+  document.getElementById('print-disp-id').textContent = id;
+  document.getElementById('print-disp-program').textContent = program;
+  document.getElementById('print-disp-term').textContent = term;
+  document.getElementById('print-disp-date').textContent = new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+  document.getElementById('print-disp-standing').textContent = standing;
+
+  // Build print table
+  let tableHtml = `
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 10%;">Sl No.</th>
+          <th style="width: 45%;">Course Title / Catalog No.</th>
+          <th style="width: 15%; text-align: center;">Credit Hours</th>
+          <th style="width: 15%; text-align: center;">Letter Grade</th>
+          <th style="width: 15%; text-align: center;">Grade Points</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  let totalCr = 0;
+  let passedCr = 0;
+  let totalQP = 0;
+
+  currentCourses.forEach((c, idx) => {
+    totalCr += c.credits;
+    totalQP += (c.credits * c.gp);
+    if (c.gp >= 2.25) passedCr += c.credits;
+
+    tableHtml += `
+      <tr>
+        <td style="text-align: center;">${idx + 1}</td>
+        <td><strong>${c.title || 'Untitled Course'}</strong></td>
+        <td style="text-align: center;">${c.credits.toFixed(1)}</td>
+        <td style="text-align: center;"><strong>${c.grade}</strong></td>
+        <td style="text-align: center;">${c.gp.toFixed(2)}</td>
+      </tr>
+    `;
+  });
+
+  tableHtml += `</tbody></table>`;
+  document.getElementById('print-courses-wrapper').innerHTML = tableHtml;
+
+  const termGpa = totalCr > 0 ? (totalQP / totalCr).toFixed(2) : '0.00';
+  document.getElementById('print-total-cr').textContent = totalCr.toFixed(1);
+  document.getElementById('print-passed-cr').textContent = passedCr.toFixed(1);
+  document.getElementById('print-total-qp').textContent = totalQP.toFixed(2);
+  document.getElementById('print-term-gpa').textContent = termGpa;
+
+  // Trigger browser print
+  window.print();
 }

@@ -66,11 +66,21 @@
                 <p class="card-desc">Enter course details, credits, and earned marks or letter grades.</p>
               </div>
               <div class="card-header-actions">
-                <button id="add-course-btn" class="btn btn-primary btn-sm">
+                <button id="add-course-btn" class="btn btn-primary btn-sm" title="Add new course row">
                   <span>➕ Add Course</span>
                 </button>
-                <button id="reset-courses-btn" class="btn btn-outline btn-sm">
-                  <span>🗑️ Clear</span>
+                <button id="export-csv-btn" class="btn btn-outline btn-sm" title="Export course list as CSV file">
+                  <span>📥 Export CSV</span>
+                </button>
+                <label for="import-csv-input" class="btn btn-outline btn-sm" title="Import courses from CSV" style="cursor: pointer; margin: 0;">
+                  <span>📤 Import CSV</span>
+                  <input type="file" id="import-csv-input" accept=".csv" style="display: none;">
+                </label>
+                <button id="print-transcript-btn" class="btn btn-secondary btn-sm" title="Print official semester grade slip">
+                  <span>🖨️ Grade Slip</span>
+                </button>
+                <button id="reset-courses-btn" class="btn btn-outline btn-sm" title="Clear all courses">
+                  <span>🗑️</span>
                 </button>
               </div>
             </div>
@@ -487,5 +497,57 @@
   </div>
 
   <script src="script.js"></script>
+
+  <!-- Official AIUB Academic Grade Slip (Rendered exclusively in Print/PDF Mode) -->
+  <div class="official-grade-slip-print" id="official-grade-slip">
+    <div class="print-university-header">
+      <div class="print-univ-logo">🎓</div>
+      <div class="print-univ-title">
+        <h2>AMERICAN INTERNATIONAL UNIVERSITY-BANGLADESH (AIUB)</h2>
+        <p class="print-univ-sub">OFFICE OF THE CONTROLLER OF EXAMINATIONS</p>
+        <p class="print-slip-heading">SEMESTER GRADE REPORT & ACADEMIC TRANSCRIPT SLIP</p>
+      </div>
+    </div>
+
+    <div class="print-meta-grid">
+      <div><strong>Student Name:</strong> <span id="print-disp-name">--</span></div>
+      <div><strong>Student ID:</strong> <span id="print-disp-id">--</span></div>
+      <div><strong>Program:</strong> <span id="print-disp-program">--</span></div>
+      <div><strong>Academic Session:</strong> <span id="print-disp-term">--</span></div>
+      <div><strong>Date of Issue:</strong> <span id="print-disp-date">--</span></div>
+      <div><strong>Academic Standing:</strong> <span id="print-disp-standing">--</span></div>
+    </div>
+
+    <div class="print-table-wrapper" id="print-courses-wrapper">
+      <!-- Cloned via JS during print -->
+    </div>
+
+    <div class="print-summary-box">
+      <div class="print-metric-col">
+        <span>Total Credits Attempted: <strong id="print-total-cr">0.0</strong></span>
+        <span>Credits Passed / Earned: <strong id="print-passed-cr">0.0</strong></span>
+      </div>
+      <div class="print-metric-col">
+        <span>Total Quality Points: <strong id="print-total-qp">0.00</strong></span>
+        <span>Semester GPA (Term): <strong id="print-term-gpa" style="font-size: 1.15rem; color: #000;">0.00</strong></span>
+      </div>
+    </div>
+
+    <div class="print-signatures">
+      <div class="sign-block">
+        <div class="sign-line"></div>
+        <span>Student Signature</span>
+      </div>
+      <div class="sign-block">
+        <div class="sign-line"></div>
+        <span>Academic Advisor</span>
+      </div>
+      <div class="sign-block">
+        <div class="sign-line"></div>
+        <span>Controller of Examinations</span>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

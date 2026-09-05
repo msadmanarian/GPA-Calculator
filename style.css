@@ -805,3 +805,202 @@ td {
   color: var(--text-muted);
   margin-top: 0.25rem;
 }
+
+
+/* Student Profile Bar */
+.student-profile-bar {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  background: var(--bg-tertiary);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.profile-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.profile-field label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-secondary);
+}
+
+.form-control-xs {
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.form-control-xs:focus {
+  outline: none;
+  border-color: var(--border-focus);
+}
+
+/* Official Grade Slip Container (Hidden on Screen) */
+.official-grade-slip-print {
+  display: none;
+}
+
+/* Print Stylesheet for Official Grade Slip */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+  }
+
+  .app-header,
+  .nav-tabs,
+  .card-header-actions,
+  .quick-info-bar,
+  .summary-actions,
+  .app-footer,
+  .delete-row-btn,
+  .course-marks-input,
+  .icon-btn,
+  .modal-overlay,
+  .summary-card {
+    display: none !important;
+  }
+
+  .app-container {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .grid-2col {
+    display: block !important;
+  }
+
+  .card {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+
+  .official-grade-slip-print {
+    display: block !important;
+    margin: 1cm auto;
+    width: 100%;
+    padding: 1.5cm;
+    border: 2px solid #000;
+    box-sizing: border-box;
+    page-break-inside: avoid;
+  }
+
+  .print-university-header {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    border-bottom: 2px solid #000;
+    padding-bottom: 0.8rem;
+    margin-bottom: 1.2rem;
+  }
+
+  .print-univ-logo {
+    font-size: 3rem;
+  }
+
+  .print-univ-title h2 {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.2rem;
+  }
+
+  .print-univ-sub {
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .print-slip-heading {
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-top: 0.35rem;
+    text-decoration: underline;
+  }
+
+  .print-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.4rem 1.5rem;
+    font-size: 0.85rem;
+    margin-bottom: 1.25rem;
+    background: #f8f9fa;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ccc;
+  }
+
+  .print-table-wrapper table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.25rem;
+  }
+
+  .print-table-wrapper th,
+  .print-table-wrapper td {
+    border: 1px solid #000 !important;
+    padding: 0.5rem 0.65rem !important;
+    font-size: 0.85rem !important;
+  }
+
+  .print-table-wrapper th {
+    background: #e9ecef !important;
+    font-weight: 800;
+  }
+
+  .print-summary-box {
+    display: flex;
+    justify-content: space-between;
+    border: 1.5px solid #000;
+    padding: 0.75rem 1.25rem;
+    margin-bottom: 2.5rem;
+    font-size: 0.9rem;
+    background: #f8f9fa;
+  }
+
+  .print-metric-col {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .print-signatures {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 3rem;
+    padding-top: 1rem;
+  }
+
+  .sign-block {
+    text-align: center;
+    width: 28%;
+  }
+
+  .sign-line {
+    border-top: 1.5px solid #000;
+    margin-bottom: 0.35rem;
+  }
+
+  .sign-block span {
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+}
