@@ -140,5 +140,20 @@ class TestAIUBGPACalculator(unittest.TestCase):
         # Overlapping slots: 12:40-14:40 and 13:00-14:30
         self.assertTrue(is_clash("12:40", "14:40", "13:00", "14:30"))
 
+    def test_latin_honors_tier_classification(self):
+        def classify_honors(cgpa):
+            if cgpa >= 3.90: return "Summa Cum Laude"
+            if cgpa >= 3.75: return "Magna Cum Laude"
+            if cgpa >= 3.65: return "Cum Laude"
+            return "Standard"
+
+        self.assertEqual(classify_honors(3.95), "Summa Cum Laude")
+        self.assertEqual(classify_honors(3.90), "Summa Cum Laude")
+        self.assertEqual(classify_honors(3.85), "Magna Cum Laude")
+        self.assertEqual(classify_honors(3.75), "Magna Cum Laude")
+        self.assertEqual(classify_honors(3.70), "Cum Laude")
+        self.assertEqual(classify_honors(3.65), "Cum Laude")
+        self.assertEqual(classify_honors(3.50), "Standard")
+
 if __name__ == '__main__':
     unittest.main()

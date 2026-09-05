@@ -1410,3 +1410,91 @@ td {
 .delete-slot-btn:hover {
   color: var(--danger);
 }
+
+/* Graduation Honors Showcase Styles */
+.honors-showcase-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.showcase-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.showcase-header h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.showcase-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.medals-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.medal-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.6rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  opacity: 0.5;
+  transition: var(--transition);
+}
+
+.medal-box.active-tier {
+  opacity: 1;
+  border-color: #f59e0b;
+  background: #fffbeb;
+  box-shadow: 0 4px 10px rgba(245, 158, 11, 0.15);
+  transform: translateY(-2px);
+}
+
+[data-theme="dark"] .medal-box.active-tier {
+  background: #271c06;
+  border-color: #d97706;
+}
+
+.medal-icon {
+  font-size: 1.5rem;
+  margin-bottom: 0.2rem;
+}
+
+.medal-name {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.medal-bench {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.honors-guidance-sub {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-sm);
+}
