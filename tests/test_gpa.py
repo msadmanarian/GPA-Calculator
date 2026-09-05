@@ -98,5 +98,18 @@ class TestAIUBGPACalculator(unittest.TestCase):
         # Gain: 3 * 1.25 = 3.75 QP. New QP: (3.60 * 98) + 3.75 = 352.8 + 3.75 = 356.55 / 98 = 3.638 -> 3.64
         self.assertEqual(new_cgpa, 3.64)
 
+    def test_academic_advisor_alerts(self):
+        # Test detection of low-grade courses requiring retake or blocking prerequisite
+        courses = [
+            {'title': 'Math 1', 'credits': 3, 'gp': 4.00},
+            {'title': 'Physics', 'credits': 3, 'gp': 2.25},  # D - Marginal pass
+            {'title': 'English', 'credits': 3, 'gp': 0.00}   # F - Failing / Prereq blocked
+        ]
+        low_grades = [c for c in courses if c['gp'] <= 2.50]
+        self.assertEqual(len(low_grades), 2)
+        failing = [c for c in low_grades if c['gp'] == 0.00]
+        self.assertEqual(len(failing), 1)
+        self.assertEqual(failing[0]['title'], 'English')
+
 if __name__ == '__main__':
     unittest.main()

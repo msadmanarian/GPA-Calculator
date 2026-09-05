@@ -294,6 +294,7 @@ function attachCourseRowListeners() {
 function calculateSemesterGPA() {
   saveCoursesToStorage();
   renderGradeDistributionChart();
+  updateAcademicAdvisor();
   let totalCredits = 0;
   let totalQualityPoints = 0;
   let passedCredits = 0;
@@ -702,6 +703,7 @@ function handleCSVImport(event) {
       calculateSemesterGPA();
       saveCoursesToStorage();
   renderGradeDistributionChart();
+  updateAcademicAdvisor();
       alert(`Successfully imported ${newCourses.length} courses from CSV.`);
     } else {
       alert('Could not parse any courses from the provided CSV file.');
@@ -924,4 +926,69 @@ function renderGradeDistributionChart() {
 // Call renderGradeDistributionChart on window resize
 window.addEventListener('resize', () => {
   renderGradeDistributionChart();
+  updateAcademicAdvisor();
 });
+
+
+/* =========================================================
+   AIUB Academic Retake Recommendation Engine
+   ========================================================= */
+function updateAcademicAdvisor() {
+  const advisorCard = document.getElementById('advisor-card');
+  const advisorList = document.getElementById('advisor-list');
+  const countBadge = document.getElementById('advisor-count-badge');
+  if (!advisorCard || !advisorList) return;
+
+  const lowGradeCourses = currentCourses.filter(c => c.gp <= 2.50);
+
+  if (lowGradeCourses.length === 0) {
+    advisorCard.style.display = 'none';
+    return;
+  }
+
+  advisorCard.style.display = 'block';
+  countBadge.textContent = `${lowGradeCourses.length} Alert${lowGradeCourses.length === 1 ? '' : 's'}`;
+
+  advisorList.innerHTML = '';
+  lowGradeCourses.forEach(c => {
+    const isFailing = c.gp === 0.00;
+    const item = document.createElement('div');
+    item.className = `advisor-item ${isFailing ? '' : 'warning-item'}`;
+
+    const boost = ((c.credits * (4.00 - c.gp)) / 98).toFixed(3); // Based on ~98 cr base
+
+    item.innerHTML = `
+      <div class="advisor-info">
+        <span class="advisor-course-title">${c.title || 'Untitled Course'} (${c.grade} - ${c.gp.toFixed(2)} GP)</span>
+        <span class="advisor-detail">
+          ${isFailing 
+            ? '🚨 <strong>Prerequisite Blocked:</strong> 0 credits earned. Course must be repeated to unlock future courses.' 
+            : `⚠️ <strong>Marginal Passing:</strong> Retaking to A+ yields +${boost} boost to overall CGPA.`}
+        </span>
+      </div>
+      <button class="simulate-retake-btn" data-title="${c.title}" data-credits="${c.credits}" data-gp="${c.gp}">
+        Simulate Retake ➔
+      </button>
+    `;
+    advisorList.appendChild(item);
+  });
+
+  // Attach simulator jump buttons
+  advisorList.querySelectorAll('.simulate-retake-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const cr = e.currentTarget.getAttribute('data-credits');
+      const gp = e.currentTarget.getAttribute('data-gp');
+
+      // Set values in Tab 3
+      const courseCrInput = document.getElementById('retake-course-credits');
+      const oldGradeSelect = document.getElementById('retake-old-grade');
+
+      if (courseCrInput) courseCrInput.value = cr;
+      if (oldGradeSelect) oldGradeSelect.value = parseFloat(gp).toFixed(2);
+
+      // Jump to Tab 3
+      document.getElementById('tab-retake-btn').click();
+      calculateRetakeImpact();
+    });
+  });
+}

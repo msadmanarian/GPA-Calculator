@@ -1075,3 +1075,89 @@ td {
   height: 8px;
   border-radius: 50%;
 }
+
+/* Academic Advisor & Retake Alert Card */
+.advisor-card {
+  background: var(--bg-secondary);
+  border: 1.5px solid var(--warning);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  margin-bottom: 1.25rem;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+}
+
+.advisor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.advisor-header h4 {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.advisor-intro {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.75rem;
+}
+
+.advisor-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.advisor-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--danger);
+  border-radius: var(--radius-sm);
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.advisor-item.warning-item {
+  border-left-color: var(--warning);
+}
+
+.advisor-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.advisor-course-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.advisor-detail {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+}
+
+.simulate-retake-btn {
+  padding: 0.35rem 0.65rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: var(--transition);
+}
+
+.simulate-retake-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+}
