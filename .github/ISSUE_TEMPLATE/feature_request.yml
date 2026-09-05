@@ -1,0 +1,16 @@
+name: 🚀 Feature Request
+description: Propose an academic utility or UI enhancement for AIUB students
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Suggest an idea or course-specific calculator for the AIUB academic platform.
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature Description
+      description: A clear and concise description of the proposed academic feature.
+    validations:
+      required: true
