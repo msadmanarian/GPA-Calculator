@@ -77,6 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load default course bundle
   initStudentProfile();
   initDegreeAudit();
+  initClassRoutine();
   initCSVFeatures();
   if (!loadCoursesFromStorage()) {
     loadCoursesPreset('sem8');
@@ -1240,4 +1241,174 @@ function renderDegreeAudit() {
 
 function saveAuditProgress() {
   localStorage.setItem('aiub-audit-completed', JSON.stringify(Array.from(completedAuditCodes)));
+}
+
+
+/* =========================================================
+   AIUB Weekly Class Routine & Clash Detection Engine
+   ========================================================= */
+let classRoutine = [];
+
+const AIUB_SAMPLE_ROUTINE = [
+  { id: '1', course: 'Operating Systems [Theory]', day: 'Monday', start: '15:00', end: '17:00', room: 'Room 9304' },
+  { id: '2', course: 'Operating Systems [Lab]', day: 'Wednesday', start: '15:00', end: '17:20', room: 'Lab DS0204' },
+  { id: '3', course: 'Computer Networks [Theory]', day: 'Wednesday', start: '12:40', end: '14:40', room: 'Room 9208' },
+  { id: '4', course: 'Computer Networks [Lab]', day: 'Monday', start: '12:40', end: '15:00', room: 'Lab DS0108' },
+  { id: '5', course: 'Research Methodology', day: 'Sunday', start: '11:20', end: '12:50', room: 'Room 3113' },
+  { id: '6', course: 'Research Methodology', day: 'Tuesday', start: '11:20', end: '12:50', room: 'Room 3113' },
+  { id: '7', course: 'Machine Learning', day: 'Sunday', start: '13:00', end: '14:30', room: 'Room 3111' },
+  { id: '8', course: 'Machine Learning', day: 'Tuesday', start: '13:00', end: '14:30', room: 'Room 3111' }
+];
+
+function initClassRoutine() {
+  const addBtn = document.getElementById('routine-add-btn');
+  const clearBtn = document.getElementById('routine-clear-btn');
+  const sampleBtn = document.getElementById('routine-load-sample-btn');
+
+  // Load from local storage
+  const saved = localStorage.getItem('aiub-class-routine');
+  if (saved) {
+    try {
+      const arr = JSON.parse(saved);
+      if (Array.isArray(arr) && arr.length > 0) classRoutine = arr;
+    } catch(e) {}
+  } else {
+    classRoutine = [...AIUB_SAMPLE_ROUTINE];
+  }
+
+  renderClassRoutine();
+
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      const course = document.getElementById('routine-course-input').value.trim();
+      const room = document.getElementById('routine-room-input').value.trim() || 'TBA';
+      const day = document.getElementById('routine-day-select').value;
+      const start = document.getElementById('routine-start-time').value;
+      const end = document.getElementById('routine-end-time').value;
+
+      if (!course) {
+        alert('Please enter a course title.');
+        return;
+      }
+      if (!start || !end || start >= end) {
+        alert('Please provide valid start and end times (end time must be after start time).');
+        return;
+      }
+
+      classRoutine.push({
+        id: Date.now().toString(36),
+        course: course,
+        room: room,
+        day: day,
+        start: start,
+        end: end
+      });
+
+      saveRoutineToStorage();
+      renderClassRoutine();
+      document.getElementById('routine-course-input').value = '';
+    });
+  }
+
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      if (confirm('Clear all scheduled class slots?')) {
+        classRoutine = [];
+        saveRoutineToStorage();
+        renderClassRoutine();
+      }
+    });
+  }
+
+  if (sampleBtn) {
+    sampleBtn.addEventListener('click', () => {
+      classRoutine = [...AIUB_SAMPLE_ROUTINE];
+      saveRoutineToStorage();
+      renderClassRoutine();
+    });
+  }
+}
+
+// Convert "HH:MM" to total minutes
+function timeToMinutes(timeStr) {
+  const [h, m] = timeStr.split(':').map(Number);
+  return h * 60 + m;
+}
+
+// Detect if two slots clash
+function isTimeClash(slotA, slotB) {
+  if (slotA.day !== slotB.day || slotA.id === slotB.id) return false;
+  const aStart = timeToMinutes(slotA.start);
+  const aEnd = timeToMinutes(slotA.end);
+  const bStart = timeToMinutes(slotB.start);
+  const bEnd = timeToMinutes(slotB.end);
+  return (aStart < bEnd && aEnd > bStart);
+}
+
+function renderClassRoutine() {
+  const grid = document.getElementById('routine-timetable-grid');
+  const countBadge = document.getElementById('routine-total-classes-badge');
+  const clashBanner = document.getElementById('routine-clash-banner');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+  countBadge.textContent = `${classRoutine.length} Classes`;
+
+  const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Saturday'];
+  let hasAnyClash = false;
+
+  days.forEach(day => {
+    const daySlots = classRoutine.filter(s => s.day === day).sort((a, b) => a.start.localeCompare(b.start));
+    if (daySlots.length === 0) return;
+
+    const block = document.createElement('div');
+    block.className = 'routine-day-block';
+
+    let slotsHtml = '';
+    daySlots.forEach(slot => {
+      const isClashing = daySlots.some(other => isTimeClash(slot, other));
+      if (isClashing) hasAnyClash = true;
+
+      slotsHtml += `
+        <div class="routine-slot-item ${isClashing ? 'has-clash' : ''}">
+          <div>
+            <span class="slot-time">${slot.start} - ${slot.end}</span> | 
+            <span class="slot-course">${slot.course}</span> 
+            <span class="slot-room">(${slot.room})</span>
+            ${isClashing ? '<span style="color: var(--danger); font-weight: 700; margin-left: 0.3rem;">[CLASH!]</span>' : ''}
+          </div>
+          <button class="delete-slot-btn" data-id="${slot.id}" title="Remove slot">❌</button>
+        </div>
+      `;
+    });
+
+    block.innerHTML = `
+      <div class="routine-day-header">
+        <span>${day}</span>
+        <span>${daySlots.length} Class${daySlots.length === 1 ? '' : 'es'}</span>
+      </div>
+      <div class="routine-slots-list">${slotsHtml}</div>
+    `;
+    grid.appendChild(block);
+  });
+
+  if (classRoutine.length === 0) {
+    grid.innerHTML = `<div style="text-align: center; color: var(--text-muted); padding: 2rem;">No classes scheduled. Click "Load Semester 8 Routine" or add slots above.</div>`;
+  }
+
+  clashBanner.style.display = hasAnyClash ? 'block' : 'none';
+
+  // Attach delete buttons
+  grid.querySelectorAll('.delete-slot-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = e.currentTarget.getAttribute('data-id');
+      classRoutine = classRoutine.filter(s => s.id !== id);
+      saveRoutineToStorage();
+      renderClassRoutine();
+    });
+  });
+}
+
+function saveRoutineToStorage() {
+  localStorage.setItem('aiub-class-routine', JSON.stringify(classRoutine));
 }

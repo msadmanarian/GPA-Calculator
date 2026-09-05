@@ -126,5 +126,19 @@ class TestAIUBGPACalculator(unittest.TestCase):
         self.assertTrue(earned_after_sem8 >= senior_thesis_threshold)
         self.assertEqual(total_degree_credits - earned_after_sem8, 35.0)
 
+    def test_routine_schedule_clash_detection(self):
+        def time_to_min(t):
+            h, m = map(int, t.split(':'))
+            return h * 60 + m
+
+        def is_clash(a_start, a_end, b_start, b_end):
+            return time_to_min(a_start) < time_to_min(b_end) and time_to_min(a_end) > time_to_min(b_start)
+
+        # Non-overlapping slots: 11:20-12:50 and 13:00-14:30
+        self.assertFalse(is_clash("11:20", "12:50", "13:00", "14:30"))
+        
+        # Overlapping slots: 12:40-14:40 and 13:00-14:30
+        self.assertTrue(is_clash("12:40", "14:40", "13:00", "14:30"))
+
 if __name__ == '__main__':
     unittest.main()
