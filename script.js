@@ -395,6 +395,7 @@ function initCGPAForecaster() {
   syncBtn.addEventListener('click', syncSemesterToCGPA);
 
   calculateCumulativeCGPA();
+  updateHonorsShowcase(parseFloat(document.getElementById('projected-cgpa-val').textContent) || 3.74);
 }
 
 function syncSemesterToCGPA() {
@@ -456,6 +457,7 @@ function calculateCumulativeCGPA() {
     standingSub.textContent = 'Good Academic Standing (Graduation Capable)';
   } else {
     standingSub.textContent = 'Caution: Minimum 2.50 CGPA required for graduation';
+  updateHonorsShowcase(newCGPA);
   }
 }
 
@@ -1411,4 +1413,48 @@ function renderClassRoutine() {
 
 function saveRoutineToStorage() {
   localStorage.setItem('aiub-class-routine', JSON.stringify(classRoutine));
+}
+
+
+/* =========================================================
+   Graduation Latin Honors Evaluation Logic
+   ========================================================= */
+function updateHonorsShowcase(projectedCGPA) {
+  const summaBox = document.getElementById('medal-summa');
+  const magnaBox = document.getElementById('medal-magna');
+  const cumlaudeBox = document.getElementById('medal-cumlaude');
+  const pill = document.getElementById('honors-current-tier');
+  const gapDesc = document.getElementById('honors-gap-desc');
+
+  if (!summaBox || !magnaBox || !cumlaudeBox) return;
+
+  [summaBox, magnaBox, cumlaudeBox].forEach(b => b.classList.remove('active-tier'));
+
+  if (projectedCGPA >= 3.90) {
+    summaBox.classList.add('active-tier');
+    pill.textContent = '🥇 Summa Cum Laude Eligible';
+    pill.style.background = '#fef3c7';
+    pill.style.color = '#b45309';
+    gapDesc.innerHTML = `🌟 Outstanding! A projected CGPA of <strong>${projectedCGPA.toFixed(2)}</strong> meets the benchmark for <strong>Summa Cum Laude</strong> (Highest Distinction).`;
+  } else if (projectedCGPA >= 3.75) {
+    magnaBox.classList.add('active-tier');
+    pill.textContent = '🥈 Magna Cum Laude Eligible';
+    pill.style.background = '#e0f2fe';
+    pill.style.color = '#0369a1';
+    const gap = (3.90 - projectedCGPA).toFixed(2);
+    gapDesc.innerHTML = `✨ Excellent! Eligible for <strong>Magna Cum Laude</strong>. Only <strong>+${gap} CGPA</strong> away from Summa Cum Laude!`;
+  } else if (projectedCGPA >= 3.65) {
+    cumlaudeBox.classList.add('active-tier');
+    pill.textContent = '🥉 Cum Laude Eligible';
+    pill.style.background = '#ffedd5';
+    pill.style.color = '#c2410c';
+    const gap = (3.75 - projectedCGPA).toFixed(2);
+    gapDesc.innerHTML = `🎖️ Good work! Eligible for <strong>Cum Laude</strong>. Only <strong>+${gap} CGPA</strong> needed for Magna Cum Laude!`;
+  } else {
+    pill.textContent = 'Standard Standing';
+    pill.style.background = 'var(--bg-tertiary)';
+    pill.style.color = 'var(--text-secondary)';
+    const gap = (3.65 - projectedCGPA).toFixed(2);
+    gapDesc.innerHTML = `Needs <strong>+${gap} CGPA</strong> to qualify for graduation honors (Cum Laude threshold is 3.65).`;
+  }
 }
