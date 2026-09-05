@@ -1,0 +1,15 @@
+# Operating System Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor & IDE Cache
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Temporary and Log files
+*.log
+__pycache__/
+*.pyc
