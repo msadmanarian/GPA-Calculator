@@ -63,6 +63,9 @@ $$\text{New Quality Points} = \text{Current Total QP} + [\text{Course Credits} \
   - Real-time retake impact simulator showing instantaneous CGPA boost when replacing a D or C grade with an A/A+.
 - **Official AIUB Grading Scale & Honors Reference**:
   - Complete matrix with criteria for *Summa Cum Laude* (&ge;3.90), *Magna Cum Laude* (&ge;3.75), *Cum Laude* (&ge;3.65), and *Dean's Honor List* (Term GPA &ge; 3.75, &ge; 12 credits).
+- **Interactive Grade Distribution Visualizer (HTML5 Canvas)**:
+  - Custom pure HTML5 Canvas bar chart rendering the exact frequency distribution of letter grades (A+, A, B+, B, C+, C, D+, D, F) for the semester.
+  - Automatically adapts to light/dark themes with dynamic scaling, custom high-DPI canvas handling, and dynamic color legend.
 - **Student Profile & Official Grade Slip Export**:
   - Configurable student credentials (Name, Student ID, Department/Program, and Academic Session).
   - One-click "Export Grade Slip" generating an official-style academic grade sheet slip formatted with university headers, course metrics, and advisor signature lines for print or PDF export.

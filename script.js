@@ -293,6 +293,7 @@ function attachCourseRowListeners() {
 // Compute Term GPA according to AIUB Formula
 function calculateSemesterGPA() {
   saveCoursesToStorage();
+  renderGradeDistributionChart();
   let totalCredits = 0;
   let totalQualityPoints = 0;
   let passedCredits = 0;
@@ -700,6 +701,7 @@ function handleCSVImport(event) {
       renderCourseRows();
       calculateSemesterGPA();
       saveCoursesToStorage();
+  renderGradeDistributionChart();
       alert(`Successfully imported ${newCourses.length} courses from CSV.`);
     } else {
       alert('Could not parse any courses from the provided CSV file.');
@@ -784,3 +786,142 @@ function prepareAndPrintGradeSlip() {
   // Trigger browser print
   window.print();
 }
+
+
+/* =========================================================
+   Pure HTML5 Canvas Grade Distribution Chart Engine
+   ========================================================= */
+const GRADE_COLORS = {
+  'A+': '#10b981',
+  'A':  '#0284c7',
+  'B+': '#22c55e',
+  'B':  '#eab308',
+  'C+': '#f97316',
+  'C':  '#f59e0b',
+  'D+': '#ef4444',
+  'D':  '#dc2626',
+  'F':  '#991b1b'
+};
+
+function renderGradeDistributionChart() {
+  const canvas = document.getElementById('grade-dist-canvas');
+  if (!canvas) return;
+
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const rect = canvas.getBoundingClientRect();
+
+  canvas.width = rect.width * dpr;
+  canvas.height = rect.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  const width = rect.width;
+  const height = rect.height;
+
+  // Clear background
+  ctx.clearRect(0, 0, width, height);
+
+  // Tally grades
+  const counts = { 'A+': 0, 'A': 0, 'B+': 0, 'B': 0, 'C+': 0, 'C': 0, 'D+': 0, 'D': 0, 'F': 0 };
+  let maxCount = 1;
+
+  currentCourses.forEach(c => {
+    const g = (c.grade || '').toUpperCase();
+    if (counts[g] !== undefined) {
+      counts[g]++;
+      if (counts[g] > maxCount) maxCount = counts[g];
+    }
+  });
+
+  const grades = Object.keys(counts);
+  const paddingLeft = 32;
+  const paddingRight = 16;
+  const paddingTop = 24;
+  const paddingBottom = 28;
+
+  const chartW = width - paddingLeft - paddingRight;
+  const chartH = height - paddingTop - paddingBottom;
+  const colWidth = chartW / grades.length;
+  const barWidth = Math.max(12, colWidth * 0.65);
+
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const textColor = isDark ? '#94a3b8' : '#64748b';
+  const gridColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)';
+
+  // Draw Horizontal Grid Lines
+  ctx.strokeStyle = gridColor;
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= maxCount; i++) {
+    const y = paddingTop + chartH - (i / maxCount) * chartH;
+    ctx.beginPath();
+    ctx.moveTo(paddingLeft, y);
+    ctx.lineTo(width - paddingRight, y);
+    ctx.stroke();
+
+    if (i > 0 && i % Math.ceil(maxCount / 4) === 0) {
+      ctx.fillStyle = textColor;
+      ctx.font = '9px Plus Jakarta Sans, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(i, paddingLeft - 6, y + 3);
+    }
+  }
+
+  // Draw Bars
+  grades.forEach((grade, idx) => {
+    const count = counts[grade];
+    const x = paddingLeft + idx * colWidth + (colWidth - barWidth) / 2;
+    const barH = maxCount > 0 ? (count / maxCount) * chartH : 0;
+    const y = paddingTop + chartH - barH;
+
+    // Bar rectangle
+    ctx.fillStyle = count > 0 ? (GRADE_COLORS[grade] || '#3b82f6') : (isDark ? '#1e293b' : '#e2e8f0');
+    
+    // Rounded top bar
+    const radius = 4;
+    ctx.beginPath();
+    ctx.moveTo(x, paddingTop + chartH);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.lineTo(x + barWidth - radius, y);
+    ctx.quadraticCurveTo(x + barWidth, y, x + barWidth, y + radius);
+    ctx.lineTo(x + barWidth, paddingTop + chartH);
+    ctx.closePath();
+    ctx.fill();
+
+    // Value text above bar
+    if (count > 0) {
+      ctx.fillStyle = isDark ? '#f8fafc' : '#0f172a';
+      ctx.font = 'bold 10px JetBrains Mono, monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(count, x + barWidth / 2, y - 5);
+    }
+
+    // Label below
+    ctx.fillStyle = textColor;
+    ctx.font = 'bold 10px Plus Jakarta Sans, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(grade, x + barWidth / 2, height - 10);
+  });
+
+  // Update subtitle & legend
+  const courseCountEl = document.getElementById('chart-course-count');
+  if (courseCountEl) {
+    courseCountEl.textContent = `${currentCourses.length} Course${currentCourses.length === 1 ? '' : 's'}`;
+  }
+
+  const legendEl = document.getElementById('chart-legend');
+  if (legendEl) {
+    const activeGrades = grades.filter(g => counts[g] > 0);
+    legendEl.innerHTML = activeGrades.map(g => `
+      <span class="legend-tag">
+        <span class="legend-color-dot" style="background: ${GRADE_COLORS[g]};"></span>
+        <strong>${g}</strong>: ${counts[g]}
+      </span>
+    `).join('');
+  }
+}
+
+// Call renderGradeDistributionChart on window resize
+window.addEventListener('resize', () => {
+  renderGradeDistributionChart();
+});
