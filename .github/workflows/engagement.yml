@@ -1,0 +1,70 @@
+name: Project Pulse & Activity Automation
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  populate-activity:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Populate GitHub Issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Checking existing issues..."
+          EXISTING_ISSUES=$(gh issue list --state all --limit 50 --json title -q '.[].title' 2>/dev/null || true)
+
+          # Issue 1 (Closed)
+          if ! echo "$EXISTING_ISSUES" | grep -q "148-Credit Degree Audit Matrix"; then
+            I1=$(gh issue create --title "feat: Implement 148-Credit Degree Audit Matrix"               --body "Track full B.Sc. in CSE graduation clearance, group breakdowns, and the 105-credit senior thesis eligibility benchmark."               --label "enhancement")
+            gh issue close "$I1" --comment "Delivered in v1.2.0 via PR #1."
+          fi
+
+          # Issue 2 (Closed)
+          if ! echo "$EXISTING_ISSUES" | grep -q "Weekly Class Routine & Timetable Clash Detector"; then
+            I2=$(gh issue create --title "feat: Weekly Class Routine & Timetable Clash Detector"               --body "Design timetable grid supporting AIUB official slots with real-time overlap and schedule conflict warnings."               --label "enhancement")
+            gh issue close "$I2" --comment "Delivered in v1.2.0 via PR #2."
+          fi
+
+          # Issue 3 (Closed)
+          if ! echo "$EXISTING_ISSUES" | grep -q "Official Printable Grade Slip"; then
+            I3=$(gh issue create --title "feat: Student Profile & Official Printable Grade Slip"               --body "Generate formatted semester grade slip for print/PDF with institutional headers and signatures."               --label "enhancement")
+            gh issue close "$I3" --comment "Completed in v1.1.0."
+          fi
+
+          # Issue 4 (Open - Tracked by active PR)
+          if ! echo "$EXISTING_ISSUES" | grep -q "Graduation Distinction & Latin Honors Suite"; then
+            gh issue create --title "feat: Graduation Distinction & Latin Honors Suite"               --body "Add Latin honors medals (Summa Cum Laude, Magna Cum Laude, Cum Laude) with dynamic gap evaluation."               --label "enhancement"
+          fi
+
+          # Issue 5 (Open - Future roadmap)
+          if ! echo "$EXISTING_ISSUES" | grep -q "Offline Drag-and-Drop Course Reordering"; then
+            gh issue create --title "feat: Offline Drag-and-Drop Course Reordering"               --body "Allow students to reorder course rows visually in the semester calculator table."               --label "enhancement"
+          fi
+
+      - name: Open Active Pull Request
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          EXISTING_PRS=$(gh pr list --state all --json headRefName -q '.[].headRefName' 2>/dev/null || true)
+          if ! echo "$EXISTING_PRS" | grep -q "feature/academic-honors-system"; then
+            echo "Creating Pull Request for feature/academic-honors-system..."
+            gh pr create --base main               --head feature/academic-honors-system               --title "feat: Interactive Academic Distinction & Latin Honors Suite"               --body "### Summary of Changes
+- Implements Latin honors tier evaluation: Summa Cum Laude (>= 3.90), Magna Cum Laude (>= 3.75), and Cum Laude (>= 3.65).
+- Dynamic honors gap calculation showing exactly how much CGPA boost is required for the next distinction.
+- Full unit test coverage in tests/test_gpa.py.
+
+Closes #4."
+          fi
